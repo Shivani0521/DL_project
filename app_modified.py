@@ -11,9 +11,9 @@ app = Flask(__name__)
 CORS(app)
 
 # Static folder for saving output images
-OUTPUT_DIR = "/static"
+OUTPUT_DIR = os.path.join(os.getcwd(), "static")  # Local directory
 if not os.path.exists(OUTPUT_DIR):
-    os.makedirs(OUTPUT_DIR)
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Define the model paths and disease labels for different models
 MODEL_PATHS = {
