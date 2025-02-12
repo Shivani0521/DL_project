@@ -168,4 +168,4 @@ def static_files(filename):
     return send_from_directory(OUTPUT_DIR, filename)
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
