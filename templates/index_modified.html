@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fruit Disease Detector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Styles remain the same as in your provided code */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('/static/images/WhatsApp Image 2025-01-21 at 7.18.21 PM.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            color: #d61414;
+            text-align: center;
+            /* font-weight: bold; */
+        }
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.448);
+            z-index: -1;
+        }
+        #cameraPreview {
+            width: 80%; /* You can adjust this value to change the width */
+            max-width: 400px; /* You can adjust the max width if needed */
+            height: 300px; /* Set a fixed height */
+            border: 2px solid #181717b9;
+            border-radius: 10px;
+            display: block; /* Make it a block element to center it */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        header {
+            background-color: #87ba7efb;
+            color: white;
+            padding: 20px 0;
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 20px;
+            background: rgba(239, 236, 236, 0.629);
+            border-radius: 30px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            text-align: center; /* This will help center all elements inside the container */
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        #uploadForm {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        button, label, select {
+            background-color: #fbfbfb;
+            color: rgb(9, 9, 9);
+            width: 190px;
+            padding: 10px 5px;
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+            border: 2px solid black;
+            font-size: 19px;
+            margin-bottom: 5px; /* Reduce space below the buttons */
+
+        }
+
+        label {
+            display: inline-block;
+            width: 145px;
+            text-align: left;
+            padding: 10px 5px;
+            margin-bottom: 5px; /* Reduce space below the buttons */
+
+        }
+
+        button:hover, label:hover {
+            background-color: #5555557d;
+            border-color: #333; /* Optional: Change border color on hover */
+        }
+
+        select {
+            background-color: #ffffffe5;
+            color: rgb(0, 0, 0);
+            border: 2px solid black; /* Adding black border */
+            font-size: 18px;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            padding: 10px 10px;
+        }
+
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            border-color: #333; /* Optional: Change border color when focused */
+        }
+
+        #uploadButton {
+            background-color: #4fb43d61;
+            color: black;
+            font-size: 17px;
+            font-weight: bold;
+            padding: 10px 10px;
+            margin-bottom: 5px; /* Reduce space below the buttons */
+
+        }
+
+        #uploadButton:hover {
+            background-color: #2b5324;
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: row; /* Change this to row */
+            justify-content: center; /* Center the buttons horizontally */
+            gap: 20px; /* Add space between buttons */
+            margin-bottom: 2px; /* Reduced margin-bottom */
+
+        }
+
+
+        #result-container {
+            margin-top: 40px;
+        }
+
+        #result-container h3 {
+            margin-bottom: 5px;
+            color: #000;
+        }
+
+        #output-image {
+            width: 400px; /* Ensures the image takes up the same width as the camera preview */
+            height: 300px; /* Ensures the image takes up the same height as the camera preview */
+            object-fit: cover; /* Ensures the image covers the area without distortion */
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            display: none; /* Hide initially */
+            margin: 20px auto;
+        }
+
+
+
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #000;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            margin-top: 2cm;
+            font-size: 20px;
+            color: #ffffff;
+        }
+
+        .upload-message {
+            font-size: 18px;
+            color: green;
+            font-weight: 600;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: green;
+            font-weight: 400;
+            margin-top: 0px; /* Reduced gap between buttons and success message */
+            margin-bottom: 5px; /* Optional: Adjust space after the success message */
+            font-weight: bold;
+        }
+
+        #cameraButton {
+            font-size: 17px;
+            width: 200px; /* Fixed width to avoid resizing issues */
+            white-space: nowrap; /* Prevent text from breaking into multiple lines */
+            text-align: center;
+            display: inline-block; /* Ensure the button is properly aligned */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Fruit Disease Detector
+    </header>
+
+    <div class="container">
+        <h1>Upload or Capture Fruit Image</h1>
+        <form id="uploadForm">
+            <div class="buttons-container">
+                <!-- Dropdown (Select Fruit) comes first -->
+                <select id="fruitType" required>
+                    <option value="" disabled selected>Select Fruit🍉</option>
+                    <option value="mango">Mango 🥭</option>
+                    <option value="strawberry">Strawberry 🍓</option>
+                </select>
+        
+                <!-- Start Camera button second -->
+                <button type="button" id="cameraButton" onclick="toggleCamera()">Start Camera 📷</button>
+        
+                <!-- Open Gallery button third -->
+                <div>
+                    <input type="file" id="imageInput" name="image" accept="image/*" required>
+                    <label for="imageInput">Open Gallery 🖼️</label>
+                </div>
+        
+                <!-- Upload button -->
+                <button type="button" id="uploadButton">Make Prediction🤖</button>
+            </div>
+        </form>
+        
+        <div id="result-container">
+            <!-- Success Message displayed above the Prediction Result -->
+            <div id="successMessage" class="success-message" style="display: none; margin-bottom: 5px;">Image uploaded and prediction made successfully!</div>
+            
+            <h3>Prediction Result:</h3>
+            <div id="predictionResult"></div>
+            <img id="output-image" src="" alt="Input Image" style="display: none;">
+        </div>
+        
+        
+
+        <video id="cameraPreview" autoplay></video>
+
+        <div class="loader" id="loader"></div>
+
+        <div id="successMessage" class="success-message" style="display: none; margin-top: 5px;">Image uploaded successfully!</div>
+    </div>
+
+    <footer>
+        &copy;Fruit Disease AI Detection System
+    </footer>
+
+    <script>
+        let stream;
+        let cameraStarted = false;
+
+        // Handle the Start Camera button click event
+        function toggleCamera() {
+            const videoElement = document.getElementById("cameraPreview");
+            const imgElement = videoElement.querySelector("img");
+
+            if (!cameraStarted) {
+                const constraints = { video: { facingMode: "environment" } };
+
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(function (camStream) {
+                        stream = camStream;
+                        videoElement.srcObject = camStream;
+                        videoElement.style.display = "block";  // Show the video element
+                        document.getElementById("cameraButton").innerText = "Capture Image📷";
+                        cameraStarted = true;
+
+                        // Hide any selected image
+                        const outputImage = document.getElementById("output-image");
+                        outputImage.style.display = "none";  // Hide image when camera starts
+                    })
+                    .catch(function (err) {
+                        alert("Unable to access camera: " + err);
+                    });
+            } else {
+                captureImage();
+            }
+        }
+
+        function captureImage() {
+    const videoElement = document.getElementById("cameraPreview");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    // Use the same size as the camera preview
+    const videoWidth = videoElement.clientWidth;  // Use clientWidth for the width
+    const videoHeight = videoElement.clientHeight; // Use clientHeight for the height
+
+    // Set canvas size to match the video size
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
+
+    // Draw the current video frame onto the canvas
+    ctx.drawImage(videoElement, 0, 0, videoWidth, videoHeight);
+
+    canvas.toBlob(blob => {
+        if (blob) {
+            // Display the loader while uploading
+            document.getElementById("loader").style.display = "block";
+            
+            const formData = new FormData();
+            formData.append("image", blob, "captured_image.jpg");
+            formData.append("fruit_type", document.getElementById("fruitType").value);
+
+            fetch('/predict', {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("loader").style.display = "none";
+
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Display the prediction result inline (no line breaks)
+                    document.getElementById("predictionResult").innerHTML = `Disease: ${data.label} | Confidence: ${data.confidence}%`;
+                    
+                    // Show the captured image in the same container
+                    const imageElement = document.getElementById("output-image");
+                    imageElement.style.display = "block";
+                    imageElement.src = URL.createObjectURL(blob);  // Set the captured image as the source
+
+                    // Match the size of the captured image to the camera preview size
+                    imageElement.style.width = `${videoWidth}px`;  // Match video width
+                    imageElement.style.height = `${videoHeight}px`;  // Match video height
+                }
+
+                // Show success message
+                const successMessage = document.getElementById("successMessage");
+                successMessage.style.display = "block";
+                successMessage.innerHTML = "Image captured and uploaded successfully!";
+
+                // Hide camera preview after capturing
+                videoElement.style.display = "none";
+
+                // Optionally, stop the camera after capturing
+                setTimeout(() => {
+                    stopCamera();
+                }, 2000);
+            })
+            .catch(error => {
+                document.getElementById("loader").style.display = "none";
+                console.error("Error during image prediction:", error);
+                alert("An error occurred while processing the image.");
+            });
+        } else {
+            alert("Failed to capture image. Please try again.");
+        }
+    }, 'image/jpeg');
+}
+
+
+
+        function stopCamera() {
+            const videoElement = document.getElementById("cameraPreview");
+            const tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+            videoElement.srcObject = null;
+            document.getElementById("cameraButton").innerText = "Start Camera";
+            cameraStarted = false;
+        }
+
+        // Handle gallery selection
+        document.getElementById("imageInput").addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("output-image").style.display = "block";
+                    document.getElementById("output-image").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                document.getElementById("uploadButton").style.display = "block";
+                // Hide camera preview when selecting image
+                document.getElementById("cameraPreview").style.display = "none";
+            }
+        });
+
+        // Handle Make Prediction button click
+        document.getElementById("uploadButton").addEventListener("click", function () {
+            const fileInput = document.getElementById("imageInput");
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const formData = new FormData();
+                formData.append("image", file);
+                formData.append("fruit_type", document.getElementById("fruitType").value);
+
+                document.getElementById("loader").style.display = "block";
+
+                fetch('/predict', {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("loader").style.display = "none";
+
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        document.getElementById("predictionResult").innerHTML = `Disease: ${data.label} | Confidence: ${data.confidence}%`;
+
+                        // Display the selected image
+                        const imageElement = document.getElementById("output-image");
+                        imageElement.style.display = "block";
+                        imageElement.src = URL.createObjectURL(file);
+                    }
+
+                    const successMessage = document.getElementById("successMessage");
+                    successMessage.style.display = "block";
+                    successMessage.innerHTML = "Image uploaded and prediction made successfully!";
+                })
+                .catch(error => {
+                    document.getElementById("loader").style.display = "none";
+                    console.error("Error during image prediction:", error);
+                    alert("An error occurred while processing the image.");
+                });
+            } else {
+                alert("Please select an image first.");
+            }
+        });
+    </script>
+</body>
+</html>
